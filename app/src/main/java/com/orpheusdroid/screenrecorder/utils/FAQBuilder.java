@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class FAQBuilder {
     private static FAQBuilder faqBuilder;
@@ -51,12 +52,12 @@ public class FAQBuilder {
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject faq = jsonArray.getJSONObject(i);
-                FAQs.add(new FAQModel(faq.getString("question"), faq.getString("answer")));
+                FAQs.add(new FAQModel(faq.getString("question"), faq.getString("answer"), faq.getInt("weight")));
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        Collections.sort(FAQs, Collections.reverseOrder());
         return FAQs;
     }
 }

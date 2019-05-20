@@ -1,12 +1,22 @@
 package com.orpheusdroid.screenrecorder.adapter;
 
-public class FAQModel {
+public class FAQModel implements Comparable<FAQModel> {
     private String question;
     private String answer;
+    private int weight;
 
-    public FAQModel(String question, String answer) {
+    public FAQModel(String question, String answer, int Weight) {
         this.question = question;
         this.answer = answer;
+        this.weight = Weight;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 
     public String getQuestion() {
@@ -23,5 +33,10 @@ public class FAQModel {
 
     public void setAnswer(String answer) {
         this.answer = answer;
+    }
+
+    @Override
+    public int compareTo(FAQModel o) {
+        return Integer.compare(this.getWeight(), o.getWeight());
     }
 }

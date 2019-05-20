@@ -3,6 +3,7 @@ package com.orpheusdroid.screenrecorder.adapter;
 import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.orpheusdroid.screenrecorder.R;
 
 import java.util.ArrayList;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class FAQAdapter extends RecyclerView.Adapter<FAQAdapter.SimpleViewHolder> {
     private ArrayList<FAQModel> FAQs;
@@ -25,13 +26,22 @@ public class FAQAdapter extends RecyclerView.Adapter<FAQAdapter.SimpleViewHolder
         this.FAQs = FAQs;
     }
 
+    private RecyclerView recyclerView;
+
     @SuppressWarnings("deprecation")
-    public static Spanned fromHtml(String source) {
+    private static Spanned fromHtml(String source) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
         } else {
             return Html.fromHtml(source);
         }
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+
+        this.recyclerView = recyclerView;
     }
 
     @NonNull
@@ -53,6 +63,8 @@ public class FAQAdapter extends RecyclerView.Adapter<FAQAdapter.SimpleViewHolder
             );
             int angle = visible ? 0 : 90;
             holder.btn.animate().rotation(angle).setDuration(200);
+
+            TransitionManager.beginDelayedTransition(recyclerView);
         });
     }
 

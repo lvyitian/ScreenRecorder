@@ -30,6 +30,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -39,7 +40,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.orpheusdroid.screenrecorder.Const;
@@ -54,8 +58,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import androidx.annotation.NonNull;
 
 /**
  * <p>
@@ -649,21 +651,15 @@ public class SettingsPreferenceFragment extends PreferenceFragment implements Sh
         new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.alert_plugin_not_found_title)
                 .setMessage(R.string.alert_plugin_not_found_message)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        try {
-                            getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.orpheusdroid.screencamplugin")));
-                        } catch (android.content.ActivityNotFoundException e) { // if there is no Google Play on device
-                            getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.orpheusdroid.screencamplugin")));
-                        }
+                .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
+                    try {
+                        getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.orpheusdroid.screencamplugin")));
+                    } catch (android.content.ActivityNotFoundException e) { // if there is no Google Play on device
+                        getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.orpheusdroid.screencamplugin")));
                     }
                 })
-                .setNeutralButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                .setNeutralButton(android.R.string.no, (dialogInterface, i) -> {
 
-                    }
                 })
                 .create().show();
     }
@@ -678,34 +674,60 @@ public class SettingsPreferenceFragment extends PreferenceFragment implements Sh
             message = R.string.alert_dialog_internal_audio_warning_message;
             requestCode = Const.INTERNAL_AUDIO_REQUEST_CODE;
         }
-        new AlertDialog.Builder(activity)
+        AlertDialog audioWarningDialog = new AlertDialog.Builder(activity)
                 .setTitle(R.string.alert_dialog_internal_audio_warning_title)
                 .setMessage(message)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        requestAudioPermission(requestCode);
-
-                    }
-                })
-                .setNeutralButton(R.string.alert_dialog_internal_audio_warning_faq_text, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        startActivity(new Intent(getActivity(), FAQActivity.class));
-                    }
-                })
-                .setNegativeButton(R.string.alert_dialog_internal_audio_warning_negative_btn_text, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        prefs.edit().putBoolean(Const.PREFS_INTERNAL_AUDIO_DIALOG_KEY, true)
-                                .apply();
-                        requestAudioPermission(Const.INTERNAL_AUDIO_REQUEST_CODE);
-                    }
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> requestAudioPermission(requestCode))
+                .setNeutralButton(R.string.alert_dialog_internal_audio_warning_faq_text, (dialogInterface, i) -> startActivity(new Intent(getActivity(), FAQActivity.class)))
+                .setNegativeButton(R.string.alert_dialog_internal_audio_warning_negative_btn_text, (dialogInterface, i) -> {
+                    prefs.edit().putBoolean(Const.PREFS_INTERNAL_AUDIO_DIALOG_KEY, true)
+                            .apply();
+                    requestAudioPermission(Const.INTERNAL_AUDIO_REQUEST_CODE);
                 })
                 .setCancelable(false)
-                .create()
-                .show();
+                .create();
+        audioWarningDialog.show();
+
+        //Disable positive buttons (If only users are sensible enough to read without forcing them counter-intuitively)
+        disableWarningDialogButtons(10, audioWarningDialog);
     }
+
+    private void disableWarningDialogButtons(int seconds, AlertDialog dialog) {
+        Handler handler = new Handler();
+        final int[] count = {0};
+
+        final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        final Button NegativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        CharSequence positveButtonText = positiveButton.getText();
+        CharSequence NegativeButtonText = NegativeButton.getText();
+
+        positiveButton.setEnabled(false);
+        NegativeButton.setEnabled(false);
+        String message = "Wait for " + seconds + " seconds";
+        positiveButton.setText(message);
+        NegativeButton.setText(message);
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                count[0]++;
+                if (count[0] < seconds) {
+                    String message = "Wait for " + (seconds - count[0]) + " seconds";
+                    positiveButton.setText(message);
+                    NegativeButton.setText(message);
+                    handler.postDelayed(this, 1000);
+                } else {
+                    positiveButton.setEnabled(true);
+                    NegativeButton.setEnabled(true);
+
+                    positiveButton.setText(positveButtonText);
+                    NegativeButton.setText(NegativeButtonText);
+                }
+            }
+        }, 1000);
+    }
+
     /**
      * Check if "show touches" plugin is installed.
      *

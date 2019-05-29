@@ -89,8 +89,8 @@
     <string-array name="audioSettingsEntries">
         <item>None</item>
         <item>Mic</item>
-        <item>Internal Audio (Default Source)</item>
-        <item>Internal Audio (System app, R_Submix)</item>
+        <item>Internal Audio with Mic (Non-root)</item>
+        <item>Internal Audio (Root + magisk module)</item>
     </string-array>
 
     <string-array name="audioSettingsValues">

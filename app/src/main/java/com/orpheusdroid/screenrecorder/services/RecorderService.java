@@ -37,6 +37,7 @@ import android.hardware.display.VirtualDisplay;
 import android.media.AudioManager;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
+import android.media.MediaFormat;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.media.projection.MediaProjection;
@@ -432,6 +433,27 @@ public class RecorderService extends Service implements ShakeEventManager.ShakeL
         return samplingRate;
     }
 
+    private boolean getMediaCodecFor(String format) {
+        MediaCodecList list = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        MediaFormat mediaFormat = MediaFormat.createVideoFormat(
+                format,
+                WIDTH,
+                HEIGHT
+        );
+        return !list.findEncoderForFormat(mediaFormat).startsWith("OMX.google");
+    }
+
+    private int getBestVideoEncoder() {
+        int VideoCodec = MediaRecorder.VideoEncoder.DEFAULT;
+        if (getMediaCodecFor(MediaFormat.MIMETYPE_VIDEO_HEVC)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                VideoCodec = MediaRecorder.VideoEncoder.HEVC;
+            }
+        } else if (getMediaCodecFor(MediaFormat.MIMETYPE_VIDEO_AVC))
+            VideoCodec = MediaRecorder.VideoEncoder.H264;
+        return VideoCodec;
+    }
+
     /* Initialize MediaRecorder with desired default values and values set by user. Everything is
      * pretty much self explanatory */
     private void initRecorder() {
@@ -464,13 +486,13 @@ public class RecorderService extends Service implements ShakeEventManager.ShakeL
                     break;
             }
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             mMediaRecorder.setOutputFile(SAVEPATH);
             mMediaRecorder.setVideoSize(WIDTH, HEIGHT);
-            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+            mMediaRecorder.setVideoEncoder(getBestVideoEncoder());
             mMediaRecorder.setMaxFileSize(getFreeSpaceInBytes());
             if (mustRecAudio)
-                mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+                mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             mMediaRecorder.setVideoEncodingBitRate(BITRATE);
             mMediaRecorder.setVideoFrameRate(FPS);
             mMediaRecorder.prepare();

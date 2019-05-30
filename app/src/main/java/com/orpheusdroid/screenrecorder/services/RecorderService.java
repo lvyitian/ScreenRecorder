@@ -35,6 +35,8 @@ import android.graphics.Color;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.AudioManager;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.media.projection.MediaProjection;
@@ -93,6 +95,7 @@ public class RecorderService extends Service implements ShakeEventManager.ShakeL
     private int BITRATE;
     private String audioRecSource;
     private String SAVEPATH;
+    private AudioManager mAudioManager;
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 0);
@@ -168,6 +171,7 @@ public class RecorderService extends Service implements ShakeEventManager.ShakeL
 
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         //return super.onStartCommand(intent, flags, startId);
         //Find the action to perform from intent
@@ -447,8 +451,11 @@ public class RecorderService extends Service implements ShakeEventManager.ShakeL
                     mMediaRecorder.setAudioSamplingRate(Integer.parseInt(audioSamplingRate));
                     mMediaRecorder.setAudioChannels(Integer.parseInt(audioChannel));
                     mustRecAudio = true;
+
+                    Log.d(Const.TAG, "bit rate: " + audioBitRate + " sampling: " + audioSamplingRate + " channel" + audioChannel);
                     break;
                 case "3":
+                    mAudioManager.setParameters("screenRecordAudioSource=8");
                     mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.REMOTE_SUBMIX);
                     mMediaRecorder.setAudioEncodingBitRate(Integer.parseInt(audioBitRate));
                     mMediaRecorder.setAudioSamplingRate(Integer.parseInt(audioSamplingRate));
@@ -457,17 +464,15 @@ public class RecorderService extends Service implements ShakeEventManager.ShakeL
                     break;
             }
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
             mMediaRecorder.setOutputFile(SAVEPATH);
             mMediaRecorder.setVideoSize(WIDTH, HEIGHT);
-            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
             mMediaRecorder.setMaxFileSize(getFreeSpaceInBytes());
             if (mustRecAudio)
-                mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+                mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
             mMediaRecorder.setVideoEncodingBitRate(BITRATE);
             mMediaRecorder.setVideoFrameRate(FPS);
-            int orientation = (360 - ORIENTATIONS.get(screenOrientation)) % 360;
-            //mMediaRecorder.setOrientationHint(orientation);
             mMediaRecorder.prepare();
         } catch (IOException e) {
             e.printStackTrace();
@@ -715,6 +720,7 @@ public class RecorderService extends Service implements ShakeEventManager.ShakeL
 
     //Stop and destroy all the objects used for screen recording
     private void destroyMediaProjection() {
+        this.mAudioManager.setParameters("screenRecordAudioSource=0");
         try {
             mMediaRecorder.stop();
             indexFile();

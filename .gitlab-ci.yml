@@ -5,6 +5,7 @@ stages:
   - buildRelease
   - deploy
   - testBuild
+  - sast
   
 testBuild:
     image: openjdk:8-jdk

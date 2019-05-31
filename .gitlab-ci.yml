@@ -5,7 +5,6 @@ stages:
   - buildRelease
   - deploy
   - testBuild
-  - sast
   
 testBuild:
     image: openjdk:8-jdk
@@ -69,3 +68,6 @@ deployReleaseApp:
         - echo $pushScript | base64 -d > deploy.sh
     script:
         - sh deploy.sh
+
+sast:
+    stage: testBuild

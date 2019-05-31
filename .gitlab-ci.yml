@@ -1,3 +1,6 @@
+include:
+  template: SAST.gitlab-ci.yml
+
 stages:
   - buildRelease
   - deploy
@@ -6,9 +9,6 @@ stages:
 testBuild:
     image: openjdk:8-jdk
     image: npetrovsky/docker-android-sdk-ndk
-    
-    include:
-        template: SAST.gitlab-ci.yml
   
     stage: testBuild
     

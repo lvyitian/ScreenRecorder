@@ -4,7 +4,7 @@ stages:
   - testBuild
   
 include:
-        template: SAST.gitlab-ci.yml
+  template: SAST.gitlab-ci.yml
   
 testBuild:
     image: openjdk:8-jdk

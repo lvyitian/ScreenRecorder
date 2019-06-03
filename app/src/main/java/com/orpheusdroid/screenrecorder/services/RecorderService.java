@@ -440,7 +440,13 @@ public class RecorderService extends Service implements ShakeEventManager.ShakeL
                 WIDTH,
                 HEIGHT
         );
-        return !list.findEncoderForFormat(mediaFormat).startsWith("OMX.google");
+        String encoder = list.findEncoderForFormat(mediaFormat);
+        if (encoder == null) {
+            Log.d("Null Encoder: ", format);
+            return false;
+        }
+        Log.d("Encoder", encoder);
+        return !encoder.startsWith("OMX.google");
     }
 
     private int getBestVideoEncoder() {

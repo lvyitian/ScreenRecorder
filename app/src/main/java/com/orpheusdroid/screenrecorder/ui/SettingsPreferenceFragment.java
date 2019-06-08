@@ -48,6 +48,7 @@ import androidx.annotation.NonNull;
 import com.google.android.material.snackbar.Snackbar;
 import com.orpheusdroid.screenrecorder.Const;
 import com.orpheusdroid.screenrecorder.R;
+import com.orpheusdroid.screenrecorder.ScreenCamBaseApp;
 import com.orpheusdroid.screenrecorder.folderpicker.FolderChooser;
 import com.orpheusdroid.screenrecorder.folderpicker.OnDirectorySelectedListerner;
 import com.orpheusdroid.screenrecorder.interfaces.PermissionResultListener;
@@ -556,6 +557,7 @@ public class SettingsPreferenceFragment extends PreferenceFragment implements Sh
                             requestAudioPermission(Const.INTERNAL_AUDIO_REQUEST_CODE);
                         break;
                     case "3":
+                        ((ScreenCamBaseApp)getActivity().getApplication()).checkMagiskMode();
                         if (!Const.IS_MAGISK_MODE) {
                             Toast.makeText(getActivity(), getString(R.string.toast_magisk_module_required_message), Toast.LENGTH_SHORT).show();
                             recaudio.setValue("0");

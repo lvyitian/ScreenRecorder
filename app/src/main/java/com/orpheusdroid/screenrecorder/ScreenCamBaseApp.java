@@ -38,6 +38,10 @@ public class ScreenCamBaseApp extends Application {
     public void onCreate() {
         super.onCreate();
 
+        checkMagiskMode();
+    }
+
+    public void checkMagiskMode(){
         int mask = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
         Const.IS_MAGISK_MODE = (getApplicationInfo().flags & mask) != 0;
     }

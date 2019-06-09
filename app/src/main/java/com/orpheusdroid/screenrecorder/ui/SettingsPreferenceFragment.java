@@ -234,7 +234,7 @@ public class SettingsPreferenceFragment extends PreferenceFragment implements Sh
                 touchPointer.setChecked(false);
         }
 
-        if (!Const.IS_MAGISK_MODE) {
+        if (!((ScreenCamBaseApp)getActivity().getApplication()).checkMagiskMode()) {
             systemUIDemo.setChecked(false);
             systemUIDemo.setEnabled(false);
         }
@@ -557,8 +557,7 @@ public class SettingsPreferenceFragment extends PreferenceFragment implements Sh
                             requestAudioPermission(Const.INTERNAL_AUDIO_REQUEST_CODE);
                         break;
                     case "3":
-                        ((ScreenCamBaseApp)getActivity().getApplication()).checkMagiskMode();
-                        if (!Const.IS_MAGISK_MODE) {
+                        if (((ScreenCamBaseApp)getActivity().getApplication()).checkMagiskMode()) {
                             Toast.makeText(getActivity(), getString(R.string.toast_magisk_module_required_message), Toast.LENGTH_SHORT).show();
                             recaudio.setValue("0");
                             break;

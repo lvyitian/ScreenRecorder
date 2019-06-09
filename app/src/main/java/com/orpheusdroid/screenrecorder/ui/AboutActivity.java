@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.orpheusdroid.screenrecorder.BuildConfig;
 import com.orpheusdroid.screenrecorder.Const;
 import com.orpheusdroid.screenrecorder.R;
+import com.orpheusdroid.screenrecorder.ScreenCamBaseApp;
 
 import java.util.Calendar;
 
@@ -116,7 +117,7 @@ public class AboutActivity extends AppCompatActivity {
                     .append(BuildConfig.VERSION_NAME);
         }
 
-        if (Const.IS_MAGISK_MODE)
+        if (((ScreenCamBaseApp)getApplication()).checkMagiskMode())
             copyRight.append(" (Magisk Mode) ");
         else
             copyRight.append(" (Normal Mode) ");

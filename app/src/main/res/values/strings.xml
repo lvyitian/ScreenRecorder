@@ -160,7 +160,7 @@
     <string name="preference_sysui_demo_mode_title">SystemUI Demo Mode</string>
     <string name="toast_magisk_module_required_message">Magisk module is required</string>
     <string name="preference_sysui_demo_mode_summary">Enable SystemUI Demo Mode</string>
-    <string name="preference_sysui_demo_mode_key">sysui_demo</string>
+    <string name="preference_sysui_demo_mode_key" translatable="false">sysui_demo</string>
     <string name="toast_msg_root_failed">Acquiring root access failed.</string>
     <string name="shortcut_storage_permission_request_title">Please grant Storage permission before using shortcut</string>
     <string name="audiobitrate_key" translatable="false">audiobitrate</string>

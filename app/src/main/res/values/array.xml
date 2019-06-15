@@ -25,7 +25,7 @@
         <item>60</item>
     </string-array>
 
-    <string-array name="resolutionsArray" translatable="false">
+    <string-array name="resolutionsArray">
         <item>360P</item>
         <item>720P</item>
         <item>1080P</item>
@@ -39,7 +39,7 @@
         <item>1440</item>
     </string-array>
 
-    <string-array name="orientationEntries" translatable="false">
+    <string-array name="orientationEntries">
         <item>Auto</item>
         <item>Portrait</item>
         <item>Landscape</item>
@@ -51,7 +51,7 @@
         <item>landscape</item>
     </string-array>
 
-    <string-array name="bitrateArray" translatable="false">
+    <string-array name="bitrateArray">
         <item>1.0 Mbit (Very low)</item>
         <item>2.5 Mbit</item>
         <item>3.5Mbit (low)</item>
@@ -93,7 +93,7 @@
         <item>Internal Audio (Root + magisk module)</item>
     </string-array>
 
-    <string-array name="audioSettingsValues">
+    <string-array name="audioSettingsValues" translatable="false">
         <item>0</item>
         <item>1</item>
         <item>2</item>

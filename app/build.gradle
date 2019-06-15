@@ -102,7 +102,7 @@ dependencies {
     implementation 'life.knowledge4:k4l-video-trimmer:1.0'
     implementation 'com.github.google:cameraview:3eaeac09a7f'
     implementation 'com.github.MFlisar:changelog:1.1.2'
-    implementation 'com.github.topjohnwu.libsu:core:2.2.1'
+    implementation 'com.github.topjohnwu.libsu:core:2.5.0'
 
     playstoreImplementation 'org.solovyev.android:checkout:1.2.1'
     playstoreDonateImplementation 'org.solovyev.android:checkout:1.2.1'

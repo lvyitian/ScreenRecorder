@@ -1,4 +1,4 @@
-# ScreenRecorder   [![pipeline status](https://gitlab.com/vijai/screenrecorder/badges/master/pipeline.svg)](https://gitlab.com/vijai/screenrecorder/commits/master)
+# ScreenRecorder   [![pipeline status](https://gitlab.com/vijai/screenrecorder/badges/master/pipeline.svg)](https://gitlab.com/vijai/screenrecorder/commits/master) [![Crowdin](https://d322cqt584bo4o.cloudfront.net/screencam/localized.svg)](https://crowdin.com/project/screencam)
 ![App Icon](ic_launcher-web.png?raw=true "App Icon")
 
 Requires Lollipop and above (SDK 21+)

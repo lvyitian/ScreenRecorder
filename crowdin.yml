@@ -1,24 +1,9 @@
-"base_path" : "/app/src"
-#"base_url" : ""
-
-#
-# Choose file structure in crowdin
-# e.g. true or false
-#
-"preserve_hierarchy": true
-
-#
-# Files configuration
-#
-files: [
- {
-  "source" : "/main/res/values/strings.xml",
-  "dest" : "/strings.xml",
-  "translation" : "/main/res/values-%android_code%/%original_file_name%"
- }
- {
-  "source" : "/main/res/values/array.xml",
-  "dest" : "/array.xml",
-  "translation" : "/main/res/values-%android_code%/%original_file_name%"
- }
-]
+files:
+  - source: /app/src/main/res/values/strings.xml
+    translation: /app/src/main/res/values-%android_code%/%original_file_name%
+  - source: /app/src/main/res/values/array.xml
+    translation: /main/res/values-%android_code%/%original_file_name%
+  - source: /app/src/fdroid/res/values/strings.xml
+    translation: /app/src/fdroid/res/values-%android_code%/%original_file_name%
+  - source: /app/src/playstore/res/values/strings.xml
+    translation: /app/src/playstore/res/values-%android_code%/%original_file_name%

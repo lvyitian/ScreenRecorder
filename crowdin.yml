@@ -2,7 +2,7 @@ files:
   - source: /app/src/main/res/values/strings.xml
     translation: /app/src/main/res/values-%android_code%/%original_file_name%
   - source: /app/src/main/res/values/array.xml
-    translation: /main/res/values-%android_code%/%original_file_name%
+    translation: app/src/main/res/values-%android_code%/%original_file_name%
   - source: /app/src/fdroid/res/values/strings.xml
     translation: /app/src/fdroid/res/values-%android_code%/%original_file_name%
   - source: /app/src/playstore/res/values/strings.xml

@@ -16,4 +16,10 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see http://www.gnu.org/licenses
   -->
-<resources></resources>
+<resources>
+    <string name="donate_info">贊助開發作業</string>
+    <string name="donate_dollar_1">贊助 $1 美元</string>
+    <string name="donate_dollar_2">贊助 $2 美元</string>
+    <string name="donate_dollar_5">贊助 $5 美元</string>
+    <string name="donate_paypal">歡迎利用 PayPal 贊助開發者</string>
+</resources>

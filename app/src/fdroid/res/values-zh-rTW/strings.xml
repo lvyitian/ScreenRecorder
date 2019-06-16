@@ -16,4 +16,8 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see http://www.gnu.org/licenses
   -->
-<resources></resources>
+<resources>
+    <string name="donate_info">贊助開發作業</string>
+    <string name="donate_paypal">歡迎利用 PayPal 贊助開發者</string>
+    <string name="donate_custom">如想透過其他方式贊助，請傳送電子郵件至 contact@orpheusdroid.com 與我聯絡。</string>
+</resources>

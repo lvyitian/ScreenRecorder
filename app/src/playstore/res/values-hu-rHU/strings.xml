@@ -16,4 +16,10 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see http://www.gnu.org/licenses
   -->
-<resources></resources>
+<resources>
+    <string name="donate_info">A fejlesztés támogatása</string>
+    <string name="donate_dollar_1">Támogatás 1 dollárral</string>
+    <string name="donate_dollar_2">Támogatás 2 dollárral</string>
+    <string name="donate_dollar_5">Támogatás 5 dollárral</string>
+    <string name="donate_paypal">Támogass minket kívánságod szerint PayPal-lal</string>
+</resources>

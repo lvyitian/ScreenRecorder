@@ -16,4 +16,8 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see http://www.gnu.org/licenses
   -->
-<resources></resources>
+<resources>
+    <string name="donate_info">A fejlesztés támogatása</string>
+    <string name="donate_paypal">Támogass minket kívánságod szerint PayPal-lal</string>
+    <string name="donate_custom">Kérlek küldj egy e-mailt a contact@orpheusdroid.com címre hogy megbeszéljünk egy másik módszert az adományod elküldésére.</string>
+</resources>

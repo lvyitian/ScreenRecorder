@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016-2018. Vijai Chandra Prasad R.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see http://www.gnu.org/licenses
+  -->
+<resources>
+    <string-array name="audioSettingsEntries">
+        <item>Nada</item>
+        <item>Microfone</item>
+        <item>Áudio interno com Microfone (não-root)</item>
+        <item>Áudio interno (Root + módulo magisk)</item>
+    </string-array>
+    <string-array name="audioBitRates">
+        <item>128 kbps</item>
+        <item>192 kbps</item>
+        <item>256 kbps</item>
+        <item>320 kbps</item>
+    </string-array>
+    <string-array name="audioChannels">
+        <item>Mono</item>
+        <item>Estéreo</item>
+    </string-array>
+    <string-array name="audioSamplingRates">
+        <item>32 kHz</item>
+        <item>44.1 kHz</item>
+        <item>48 kHz</item>
+    </string-array>
+    <string-array name="themeArray">
+        <item>Branco</item>
+        <item>Claro</item>
+        <item>Escuro</item>
+        <item>Preto</item>
+    </string-array>
+</resources>

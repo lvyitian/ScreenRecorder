@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_notification"
+        android:shortcutDisabledMessage="@string/tile_start_recording"
+        android:shortcutId="record"
+        android:shortcutLongLabel="@string/tile_start_recording"
+        android:shortcutShortLabel="@string/tile_start_recording">
+        <intent
+            android:action="com.orpheusdroid.screenrecorder.START_RECORDING"
+            android:targetClass="com.orpheusdroid.screenrecorder.ui.MainActivity"
+            android:targetPackage="com.orpheusdroid.screenrecorder" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>

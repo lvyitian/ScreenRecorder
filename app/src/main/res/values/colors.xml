@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#463759</color>
+    <color name="colorPrimaryDark">#392850</color>
+    <color name="colorAccent">#A3A3C9</color>
+
+    <color name="infoBarColor">#B8463759</color>
+    <color name="videoListActions">#BAB9CA</color>
+    <color name="famIconColor">#fefefe</color>
+    <color name="famBGColor">#3b3b3b</color>
+
+    <color name="colorIconChip">#80000000</color>
+</resources>

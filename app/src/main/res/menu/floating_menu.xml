@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/fm_record"
+        android:icon="@drawable/ic_record"
+        android:title="Record" />
+
+    <item
+        android:id="@+id/fm_pause"
+        android:icon="@drawable/ic_pause"
+        android:title="Pause" />
+
+    <item
+        android:id="@+id/fm_stop"
+        android:icon="@drawable/ic_stop"
+        android:title="Stop" />
+</menu>

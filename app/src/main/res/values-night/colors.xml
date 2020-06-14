@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#393e46</color>
+    <color name="colorPrimaryDark">#222831</color>
+    <color name="colorAccent">#dbc6eb</color>
+
+    <color name="infoBarColor">#393e46</color>
+    <color name="videoListActions">#fefefe</color>
+</resources>

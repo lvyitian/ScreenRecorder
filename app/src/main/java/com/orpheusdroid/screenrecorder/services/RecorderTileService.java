@@ -18,10 +18,10 @@ public class RecorderTileService extends TileService {
     private boolean isServiceRunning;
     private BroadcastReceiver pong = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
-            Log.d(Const.TAG, "PONG: " + intent.getAction());
+            Log.d(Const.TAG, "Tile Service intent: " + intent.getAction());
             Const.RECORDING_STATUS status = (Const.RECORDING_STATUS) intent.getSerializableExtra(Const.SEVICE_STATUS_BROADCAST_STATUS_KEY);
             isServiceRunning = status == Const.RECORDING_STATUS.RECORDING || status == Const.RECORDING_STATUS.PAUSED;
-            updateTile(isServiceRunning);
+            updateTile();
         }
     };
 
@@ -29,7 +29,7 @@ public class RecorderTileService extends TileService {
     public void onTileAdded() {
         super.onTileAdded();
         Log.d(Const.TAG, "Tile Added");
-        updateTile(false);
+        updateTile();
     }
 
     @Override
@@ -42,9 +42,10 @@ public class RecorderTileService extends TileService {
     public void onStartListening() {
         super.onStartListening();
         isServiceRunning = false;
-        Log.d(Const.TAG, "PONG is set to false");
+        Log.d(Const.TAG, "Tile service: Service Running is set to false");
         LocalBroadcastManager.getInstance(this).registerReceiver(pong, new IntentFilter(Const.SEVICE_STATUS_BROADCAST_RESPONSE_ACTION));
         LocalBroadcastManager.getInstance(this).sendBroadcastSync(new Intent(Const.SEVICE_STATUS_BROADCAST_REQUEST_ACTION));
+        updateTile();
     }
 
     @Override
@@ -68,7 +69,7 @@ public class RecorderTileService extends TileService {
         }
     }
 
-    private void updateTile(boolean isServiceRunning) {
+    private void updateTile() {
         Tile tile = getQsTile();
         if (isServiceRunning) {
             tile.setLabel(getString(R.string.tile_stop_recording));

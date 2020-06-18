@@ -4,6 +4,9 @@
 
 image: openjdk:8-jdk
 
+include:
+  - template: License-Scanning.gitlab-ci.yml
+
 variables:
   ANDROID_COMPILE_SDK: "29"
   ANDROID_BUILD_TOOLS: "29.0.3"

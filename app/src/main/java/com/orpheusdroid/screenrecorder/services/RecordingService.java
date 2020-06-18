@@ -406,7 +406,7 @@ public class RecordingService extends Service {
                 mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             mMediaRecorder.setVideoEncodingBitRate(BITRATE);
             mMediaRecorder.setVideoFrameRate(FPS);
-            mMediaRecorder.setMaxFileSize(3000000L); //3221225472L
+            mMediaRecorder.setMaxFileSize(3221225472L); //3221225472L
             mMediaRecorder.setOnInfoListener((mediaRecorder, what, extra) -> {
                 switch (what) {
                     case MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING:

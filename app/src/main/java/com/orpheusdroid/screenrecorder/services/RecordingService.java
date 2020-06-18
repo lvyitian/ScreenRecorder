@@ -34,6 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.orpheusdroid.crashreporter.CrashReporter;
 import com.orpheusdroid.screenrecorder.Config;
 import com.orpheusdroid.screenrecorder.Const;
 import com.orpheusdroid.screenrecorder.R;
@@ -247,6 +248,7 @@ public class RecordingService extends Service {
             LocalBroadcastManager.getInstance(this).sendBroadcast(result);
         } catch (IllegalStateException ise) {
             Log.d(Const.TAG, "188: Media recorder start failed");
+            CrashReporter.logException(ise);
             ise.printStackTrace();
             mMediaProjection.stop();
             stopSelf();
@@ -418,6 +420,7 @@ public class RecordingService extends Service {
                             nextFileCount++;
                         } catch (IOException e) {
                             e.printStackTrace();
+                            CrashReporter.logException(e);
                         }
                         break;
                     case MediaRecorder.MEDIA_RECORDER_INFO_NEXT_OUTPUT_FILE_STARTED:
@@ -433,6 +436,7 @@ public class RecordingService extends Service {
             mMediaRecorder.prepare();
         } catch (IOException e) {
             e.printStackTrace();
+            CrashReporter.logException(e);
             destroyMediaProjection();
         }
     }
@@ -473,6 +477,7 @@ public class RecordingService extends Service {
                 notificationHelper.showShareNotification(itemUri);
         } catch (Exception e) {
             Log.d(Const.TAG, "Error saving screen recording: " + e);
+            CrashReporter.logException(e);
         }
     }
 
@@ -488,6 +493,7 @@ public class RecordingService extends Service {
             if (new File(config.getSaveLocation()).delete())
                 Log.d(Const.TAG, "Corrupted file delete successful");
             Toast.makeText(this, getString(R.string.fatal_exception_message), Toast.LENGTH_SHORT).show();
+            CrashReporter.logException(e);
         } finally {
             mMediaRecorder.reset();
             mVirtualDisplay.release();

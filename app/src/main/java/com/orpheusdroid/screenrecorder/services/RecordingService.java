@@ -205,6 +205,7 @@ public class RecordingService extends Service {
         mMediaRecorder.setOnErrorListener((mr, what, extra) -> {
             android.util.Log.e(Const.TAG, "Screencam Error: " + what + ", Extra: " + extra);
             Toast.makeText(this, R.string.recording_failed_toast, Toast.LENGTH_SHORT).show();
+            CrashReporter.logException(new RuntimeException("Screen Recording failed: \nWhat:" + what + "\nExtra: " + extra));
             destroyMediaProjection();
         });
 

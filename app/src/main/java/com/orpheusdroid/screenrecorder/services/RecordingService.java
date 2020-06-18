@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,11 +20,14 @@ import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -40,6 +45,8 @@ import com.orpheusdroid.screenrecorder.utils.ResolutionHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 public class RecordingService extends Service {
@@ -66,9 +73,14 @@ public class RecordingService extends Service {
     private AudioManager mAudioManager;
     private boolean isRecording = false;
     private int nextFileCount = 1;
-    private String currentFilePath = SAVEPATH;
+    private String currentFilePath;
     private String nextFilePath;
+    private File currentFile;
+    private File nextFile;
     private BroadcastReceiver serviceBroadcastReceiver;
+
+    //private File saveFile;
+
     private ServiceConnection floatingControlsConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -147,14 +159,15 @@ public class RecordingService extends Service {
                 //case Const.SCREEN_RECORDING_SHOW_FLOATING_ACTIONS:
                 //break;
                 case Const.SCREEN_RECORDING_START:
-                    SAVEPATH = configHelper.getFileSaveName(config.getSaveLocation());
-                    currentFilePath = SAVEPATH;
-                    notificationHelper.setSAVEPATH(SAVEPATH);
+                    //SAVEPATH = //configHelper.getFileSaveName(config.getSaveLocation());
+                    SAVEPATH = configHelper.getFileName();
+                    //currentFilePath = SAVEPATH;
+                    /*notificationHelper.setSAVEPATH(SAVEPATH);
                     File savelocation = new File(SAVEPATH);
                     if (!savelocation.exists() || !savelocation.isDirectory()) {
                         if (!savelocation.mkdir())
                             stopRecording();
-                    }
+                    }*/
                     Log.d(Const.TAG, "Save path: " + SAVEPATH + ".mp4");
                     if (!isRecording) {
                         startRecording();
@@ -379,23 +392,28 @@ public class RecordingService extends Service {
                     break;
             }
 
+            //currentFilePath = File.createTempFile(SAVEPATH, ".mp4");
+            currentFilePath = SAVEPATH;
+            currentFile = File.createTempFile(currentFilePath, ".mp4");
+
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            mMediaRecorder.setOutputFile(SAVEPATH + ".mp4");
+            mMediaRecorder.setOutputFile(currentFile);
             mMediaRecorder.setVideoSize(resolution.getWIDTH(), resolution.getHEIGHT());
             mMediaRecorder.setVideoEncoder(configHelper.getBestVideoEncoder(resolution.getWIDTH(), resolution.getHEIGHT()));
-            mMediaRecorder.setMaxFileSize(configHelper.getFreeSpaceInBytes(config.getSaveLocation()));
+            //mMediaRecorder.setMaxFileSize(configHelper.getFreeSpaceInBytes(config.getSaveLocation()));
             if (mustRecAudio)
                 mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             mMediaRecorder.setVideoEncodingBitRate(BITRATE);
             mMediaRecorder.setVideoFrameRate(FPS);
-            mMediaRecorder.setMaxFileSize(3221225472L);
+            mMediaRecorder.setMaxFileSize(3000000L); //3221225472L
             mMediaRecorder.setOnInfoListener((mediaRecorder, what, extra) -> {
                 switch (what) {
                     case MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING:
                         try {
                             nextFilePath = SAVEPATH + "_" + nextFileCount;
-                            mediaRecorder.setNextOutputFile(new File(nextFilePath + ".mp4"));
+                            nextFile = File.createTempFile(SAVEPATH, "_" + nextFileCount + ".mp4");
+                            mediaRecorder.setNextOutputFile(nextFile);
                             Toast.makeText(RecordingService.this, "Max File limit approaching. Next file name will be suffixed with " + nextFileCount, Toast.LENGTH_SHORT).show();
                             nextFileCount++;
                         } catch (IOException e) {
@@ -406,8 +424,10 @@ public class RecordingService extends Service {
                         Toast.makeText(RecordingService.this, "Next file started", Toast.LENGTH_SHORT).show();
                         Log.d(Const.TAG, "Next file started");
                         Log.d(Const.TAG, "Current Path:" + currentFilePath + "\n next path: " + nextFilePath);
-                        indexFile(currentFilePath + ".mp4", false);
+                        //indexFile(currentFilePath + ".mp4", false);
+                        saveToMediaStore(currentFile, false);
                         currentFilePath = nextFilePath;
+                        currentFile = nextFile;
                 }
             });
             mMediaRecorder.prepare();
@@ -417,14 +437,54 @@ public class RecordingService extends Service {
         }
     }
 
+    private void saveToMediaStore(File video, boolean isLast) {
+        Log.d(Const.TAG, "Saving video from: " + video.getAbsolutePath());
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Video.Media.DISPLAY_NAME, currentFilePath + ".mp4");
+        values.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
+        values.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
+        values.put(MediaStore.Video.Media.DATE_ADDED, System.currentTimeMillis());
+
+        ContentResolver resolver = getContentResolver();
+        Uri collectionUri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            String PATH = Environment.DIRECTORY_MOVIES + File.separator + Const.APPDIR;
+            values.put(MediaStore.Video.Media.RELATIVE_PATH, PATH);
+            values.put(MediaStore.Video.Media.DATE_TAKEN, System.currentTimeMillis());
+            collectionUri = MediaStore.Video.Media.getContentUri(
+                    MediaStore.VOLUME_EXTERNAL_PRIMARY);
+        } else {
+            String PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + Const.APPDIR;
+            new File(PATH).mkdirs();
+            Log.d(Const.TAG, "save path: " + PATH + File.separator + currentFilePath + ".mp4");
+            collectionUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            values.put(MediaStore.Video.Media.DATA, PATH + File.separator + currentFilePath + ".mp4");
+        }
+
+        try {
+            Uri itemUri = resolver.insert(collectionUri, values);
+            // Add to the mediastore
+            OutputStream os = resolver.openOutputStream(itemUri, "w");
+            Files.copy(video.toPath(), os);
+            os.close();
+
+            video.delete();
+            if (isLast)
+                notificationHelper.showShareNotification(itemUri);
+        } catch (Exception e) {
+            Log.d(Const.TAG, "Error saving screen recording: " + e);
+        }
+    }
+
     private void destroyMediaProjection() {
         mAudioManager.setParameters("screenRecordAudioSource=0");
         try {
             mMediaRecorder.stop();
-            indexFile(currentFilePath, true);
+            //indexFile(currentFilePath, true);
+            saveToMediaStore(currentFile, true);
             android.util.Log.i(Const.TAG, "MediaProjection Stopped");
         } catch (RuntimeException e) {
-            Log.d(Const.TAG, "Fatal exception! Destroying media projection failed." + "\n" + e.getMessage());
+            Log.d(Const.TAG, "Fatal exception! Destroying media projection failed." + "\n" + e);
             if (new File(config.getSaveLocation()).delete())
                 Log.d(Const.TAG, "Corrupted file delete successful");
             Toast.makeText(this, getString(R.string.fatal_exception_message), Toast.LENGTH_SHORT).show();

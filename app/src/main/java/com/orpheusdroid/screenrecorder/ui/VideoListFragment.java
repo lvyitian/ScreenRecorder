@@ -1,15 +1,19 @@
 package com.orpheusdroid.screenrecorder.ui;
 
 import android.Manifest;
+import android.content.ContentUris;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +25,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
-import com.orpheusdroid.screenrecorder.Config;
 import com.orpheusdroid.screenrecorder.Const;
 import com.orpheusdroid.screenrecorder.R;
 import com.orpheusdroid.screenrecorder.adapter.VideoListAdapter;
@@ -37,7 +40,6 @@ import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -45,6 +47,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class VideoListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, VideoFragmentListener {
 
@@ -56,6 +63,7 @@ public class VideoListFragment extends Fragment implements SwipeRefreshLayout.On
     private RecyclerView videoList;
     private ArrayList<VideoListItem> consolidatedList = new ArrayList<>();
     private VideoListAdapter videoListAdapter;
+    private Uri collection;
 
     public static VideoListFragment getInstance() {
         if (fragment == null)
@@ -92,9 +100,114 @@ public class VideoListFragment extends Fragment implements SwipeRefreshLayout.On
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
 
-        //checkPermissionAndLoadVideos();
-
         return view;
+    }
+
+    private void getVideosAndList() {
+        consolidatedList = new ArrayList<>();
+
+        String selection;
+        String PATH;
+        String[] projection = {
+                MediaStore.Video.Media._ID,
+                MediaStore.Video.Media.ARTIST,
+                MediaStore.Video.Media.TITLE,
+                MediaStore.Video.Media.DATA,
+                MediaStore.Video.Media.DATE_ADDED,
+                MediaStore.Video.Media.DISPLAY_NAME,
+                MediaStore.Video.Media.DURATION
+        };
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            collection = MediaStore.Video.Media.getContentUri(
+                    MediaStore.VOLUME_EXTERNAL_PRIMARY
+            );
+            selection = MediaStore.Video.Media.RELATIVE_PATH;
+            PATH = Environment.DIRECTORY_MOVIES + File.separator + Const.APPDIR
+                    + File.separator + "%";
+        } else {
+            collection = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            selection = MediaStore.Video.Media.DATA;
+            PATH = Environment.getExternalStorageDirectory().getPath() + File.separator
+                    + Environment.DIRECTORY_MOVIES + File.separator + Const.APPDIR
+                    + File.separator + "%";
+        }
+
+        Log.d(Const.TAG, "PATH: " + PATH);
+
+        Single.fromCallable(() -> {
+            Cursor mCursor = VideoListFragment.this.getContext().getContentResolver().query(collection, projection, selection + " like ? ",
+                    new String[]{PATH}, null);
+            return mCursor;
+        }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        swipeRefreshLayout.setRefreshing(false);
+                        throwable.printStackTrace();
+                    }
+                })
+                .subscribe(new Consumer<Cursor>() {
+                    @Override
+                    public void accept(Cursor cursor) throws Throwable {
+                        swipeRefreshLayout.setRefreshing(false);
+                        shimmer.stopShimmer();
+                        shimmer.setVisibility(View.GONE);
+                        if (cursor != null) {
+                            if (cursor.getCount() == 0) {
+                                videoList.setVisibility(View.GONE);
+                                message.setVisibility(View.VISIBLE);
+                            } else {
+                                list(cursor);
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void list(Cursor mCursor) {
+        ArrayList<Video> videosList = new ArrayList<>();
+        for (mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
+            // The Cursor is now set to the right position
+            Video video = new Video();
+            video.setFileName(mCursor.getString(mCursor.getColumnIndex(MediaStore.Video.Media.TITLE)));
+            video.setFileUri(ContentUris.withAppendedId(collection,
+                    mCursor.getLong(mCursor.getColumnIndex(MediaStore.Video.Media._ID))));
+            video.setLastModified(mCursor.getLong(mCursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED)));
+            videosList.add(video);
+        }
+        Map<Date, List<Video>> groupedHashMap = groupDataIntoHashMap(videosList);
+
+
+        for (Date date : groupedHashMap.keySet()) {
+            VideoHeader dateItem = new VideoHeader();
+            dateItem.setDate(date);
+            consolidatedList.add(dateItem);
+
+            Collections.sort(groupedHashMap.get(date), Comparator.reverseOrder());
+
+            for (Video video : groupedHashMap.get(date)) {
+                VideoItem generalItem = new VideoItem();
+                generalItem.setVideo(video);
+                consolidatedList.add(generalItem);
+            }
+        }
+        setAdapter(consolidatedList);
+    }
+
+    private void checkPermissionAndLoadVideos() {
+        if (ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // request the permission
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    Const.EXTDIR_REQUEST_CODE);
+        } else {
+            // has the permission.
+            getVideosAndList();
+        }
     }
 
     @Override
@@ -110,93 +223,16 @@ public class VideoListFragment extends Fragment implements SwipeRefreshLayout.On
         }
     }
 
-    private void checkPermissionAndLoadVideos() {
-        /*if (getActivity() instanceof MainActivity) {
-            if (! ((MainActivity) getActivity()).isVideoFragmentListernerInitialized())
-                ((MainActivity) getActivity()).setVideoFragmentListener(this);
-            ((MainActivity) getActivity()).init(Const.EXTDIR_REQUEST_CODE);
-        }*/
-        if (ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // request the permission
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    Const.EXTDIR_REQUEST_CODE);
-        } else {
-            // has the permission.
-            listVideos();
-        }
-    }
-
-    private void listVideos() {
-        File directory = new File(Config.getInstance(getActivity()).getSaveLocation());
-        //Remove directory pointers and other files from the list
-        if (!directory.exists()) {
-            if (!directory.mkdirs()) {
-                Toast.makeText(getActivity(), "The directory creation failed.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Log.d(Const.TAG, "Directory missing! Creating dir");
-        }
-
-        if (!directory.canRead() && !directory.canWrite()) {
-            Toast.makeText(getActivity(), "The directory is neither readable nor writable", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        ArrayList<File> filesList = new ArrayList<File>();
-        if (directory.isDirectory() && directory.exists()) {
-            Log.d(Const.TAG, "Getting videos for " + directory.getAbsolutePath());
-            filesList.addAll(Arrays.asList(getVideos(directory.listFiles())));
-        }
-
-        new GetVideosAsync().execute(filesList.toArray(new File[0]));
-
-        Log.d(Const.TAG, "Fetching data");
-    }
-
-    /**
-     * Filter all video files from array of files
-     *
-     * @param files File[] containing files from a directory
-     * @return File[] containing only video files
-     */
-    private File[] getVideos(File[] files) {
-        List<File> newFiles = new ArrayList<>();
-        for (File file : files) {
-            if (!file.isDirectory() && isVideoFile(file.getPath()))
-                newFiles.add(file);
-        }
-        return newFiles.toArray(new File[newFiles.size()]);
-    }
-
-
-    /*@Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Log.d(Const.TAG, "Video Activity created");
-
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null)
-            actionBar.setTitle(getString(R.string.title_videos));
-
-        //mViewModel = ViewModelProviders.of(this).get(VideoListViewModel.class);
-        // TODO: Use the ViewModel
-    }*/
-
     @Override
     public void onRefresh() {
         videoList.setVisibility(View.GONE);
         shimmer.setVisibility(View.VISIBLE);
+        shimmer.animate();
         shimmer.showShimmer(true);
-        listVideos();
+        getVideosAndList();
     }
 
     private void setAdapter(ArrayList<VideoListItem> videos) {
-        shimmer.stopShimmer();
-        shimmer.setVisibility(View.GONE);
         videoListAdapter = new VideoListAdapter(videos, (AppCompatActivity) getActivity());
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
         layoutManager.setOrientation(RecyclerView.VERTICAL);
@@ -222,8 +258,6 @@ public class VideoListFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public void onStorageResult(boolean result) {
         Log.d(Const.TAG, "Loading videos after result" + result);
-        if (result)
-            listVideos();
     }
 
     @Override
@@ -241,120 +275,36 @@ public class VideoListFragment extends Fragment implements SwipeRefreshLayout.On
                     /* Since we have write storage permission now, lets create the app directory
                      * in external storage*/
                     com.orpheusdroid.screenrecorder.utils.Log.d(Const.TAG, "write storage Permission granted");
-                    listVideos();
+                    getVideosAndList();
                 }
         }
     }
 
-    class GetVideosAsync extends AsyncTask<File[], Integer, ArrayList<VideoListItem>> {
-        File[] files;
+    private Map<Date, List<Video>> groupDataIntoHashMap(List<Video> videos) {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            //Set refreshing to true
-            consolidatedList = new ArrayList<>();
-            //swipeRefreshLayout.setRefreshing(false);
-        }
+        Map<Date, List<Video>> groupedHashMap = new TreeMap<>(Collections.reverseOrder());
 
-        @Override
-        protected void onPostExecute(ArrayList<VideoListItem> videos) {
-            //If the directory has no videos, remove recyclerview from rootview and show empty message.
-            // Else set recyclerview and remove message textview
-            if (videos.isEmpty()) {
-                shimmer.stopShimmer();
-                shimmer.setVisibility(View.GONE);
-                videoList.setVisibility(View.GONE);
-                message.setVisibility(View.VISIBLE);
+        for (Video video : videos) {
+
+            Date hashMapKey = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            try {
+                hashMapKey = sdf.parse(sdf.format(video.getLastModified()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            if (groupedHashMap.containsKey(hashMapKey)) {
+                // The key is already in the HashMap; add the pojo object
+                // against the existing key.
+                groupedHashMap.get(hashMapKey).add(video);
             } else {
-                //Sort the videos in a descending order
-                //Collections.reverse(videos);
-                setAdapter(videos);
+                // The key is not there in the HashMap; create a new key-value pair
+                List<Video> list = new ArrayList<>();
+                list.add(video);
+                groupedHashMap.put(hashMapKey, list);
             }
-            //Finish refreshing
-            swipeRefreshLayout.setRefreshing(false);
         }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-            Log.d(Const.TAG, "Progress is :" + values[0]);
-        }
-
-        @Override
-        protected ArrayList<VideoListItem> doInBackground(File[]... arg) {
-            //Get video file name, Uri and video thumbnail from mediastore
-            files = arg[0];
-            ArrayList<Video> videosList = new ArrayList<>();
-            for (int i = 0; i < files.length; i++) {
-                File file = files[i];
-                if (!file.isDirectory() && isVideoFile(file.getPath())) {
-                    Date lastModified = new Date(file.lastModified());
-                    /*SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                    try {
-                        lastModified = sdf.parse(sdf.format(lastModified));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }*/
-                    Video video = new Video(file.getName(),
-                            file,
-                            lastModified
-                    );
-                    //getBitmap(file, video);
-                    videosList.add(video);
-                    //Update progress dialog
-                    publishProgress(i);
-                }
-            }
-
-            Map<Date, List<Video>> groupedHashMap = groupDataIntoHashMap(videosList);
-
-
-            for (Date date : groupedHashMap.keySet()) {
-                VideoHeader dateItem = new VideoHeader();
-                dateItem.setDate(date);
-                consolidatedList.add(dateItem);
-
-                Collections.sort(groupedHashMap.get(date), Comparator.reverseOrder());
-
-                for (Video video : groupedHashMap.get(date)) {
-                    VideoItem generalItem = new VideoItem();
-                    generalItem.setVideo(video);
-                    consolidatedList.add(generalItem);
-                }
-                //consolidatedList.add(dateItem);
-            }
-
-            return consolidatedList;
-        }
-
-        private Map<Date, List<Video>> groupDataIntoHashMap(List<Video> videos) {
-
-            Map<Date, List<Video>> groupedHashMap = new TreeMap<>(Collections.reverseOrder());
-
-            for (Video video : videos) {
-
-                Date hashMapKey = new Date();
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                try {
-                    hashMapKey = sdf.parse(sdf.format(video.getLastModified()));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                if (groupedHashMap.containsKey(hashMapKey)) {
-                    // The key is already in the HashMap; add the pojo object
-                    // against the existing key.
-                    groupedHashMap.get(hashMapKey).add(video);
-                } else {
-                    // The key is not there in the HashMap; create a new key-value pair
-                    List<Video> list = new ArrayList<>();
-                    list.add(video);
-                    groupedHashMap.put(hashMapKey, list);
-                }
-            }
-            return groupedHashMap;
-        }
+        return groupedHashMap;
     }
 }

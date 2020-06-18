@@ -1,7 +1,6 @@
 package com.orpheusdroid.screenrecorder.adapter;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +21,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.orpheusdroid.crashreporter.reporter.FilesProvider;
 import com.orpheusdroid.screenrecorder.Const;
 import com.orpheusdroid.screenrecorder.R;
 import com.orpheusdroid.screenrecorder.adapter.models.videolist.VideoHeader;
@@ -98,7 +96,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 videoViewHolder.fileName.setText(videoItem.getVideo().getFileName());
 
                 Glide.with(context)
-                        .load(videoItem.getVideo().getFile())
+                        .load(videoItem.getVideo().getFileUri())
                         .centerCrop()
                         .into(videoViewHolder.thumbnail);
 
@@ -123,7 +121,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     videoItem.getType();
                     Log.d(Const.TAG, "Video clicked");
                     Intent videoPlayer = new Intent(Intent.ACTION_VIEW);
-                    videoPlayer.setDataAndType(Uri.parse(videoItem.getVideo().getFile().getAbsolutePath()), "video/mp4");
+                    videoPlayer.setDataAndType(videoItem.getVideo().getFileUri(), "video/mp4");
                     context.startActivity(videoPlayer);
                 });
 
@@ -145,11 +143,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private boolean handlePopupMenu(MenuItem menuItem, VideoItem videoItem, int position) {
         switch (menuItem.getItemId()) {
             case R.id.action_share:
-                Uri uri = FilesProvider.getUriForFile(context.getApplicationContext(), "com.orpheusdroid.screenrecorder.fileprovider",
-                        videoItem.getVideo().getFile());
+                /*Uri uri = FilesProvider.getUriForFile(context.getApplicationContext(), "com.orpheusdroid.screenrecorder.fileprovider",
+                        videoItem.getVideo().getFile());*/
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType(Intent.normalizeMimeType("video/mp4"));
-                intent.putExtra(Intent.EXTRA_STREAM, uri);
+                intent.putExtra(Intent.EXTRA_STREAM, videoItem.getVideo().getFileUri());
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                 Intent chooserIntent = Intent.createChooser(intent, context.getString(com.orpheusdroid.crashreporter.R.string.intent_share_title));
@@ -157,9 +155,12 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 context.startActivity(chooserIntent);
                 break;
             case R.id.action_delete:
-                videoItem.getVideo().getFile().delete();
-                videos.remove(videoItem);
-                notifyItemRemoved(position);
+                //videoItem.getVideo().getFile().delete();
+                int result = context.getContentResolver().delete(videoItem.getVideo().getFileUri(), null, null);
+                if (result > 0) {
+                    videos.remove(videoItem);
+                    notifyItemRemoved(position);
+                }
                 break;
         }
         return false;
@@ -209,8 +210,10 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             for (VideoItem selectedVideo :
                     selectedVideoPositions) {
                 Log.d(Const.TAG, "Delete video at pos: " + selectedVideo.getVideo().getFileName());
-                selectedVideo.getVideo().getFile().delete();
-                videos.remove(selectedVideo);
+                int result = context.getContentResolver().delete(selectedVideo.getVideo().getFileUri(), null, null);
+                if (result > 0) {
+                    videos.remove(selectedVideo);
+                }
             }
         }
         mode.finish();

@@ -1,6 +1,7 @@
 package com.orpheusdroid.screenrecorder.adapter.models.videolist;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 import java.io.File;
 import java.util.Date;
@@ -8,10 +9,15 @@ import java.util.Date;
 public class Video implements Comparable<Video> {
     private String FileName;
     private File file;
+    private Uri fileUri;
     private Bitmap thumbnail;
     private Date lastModified;
     private boolean isSection = false;
     private boolean isSelected = false;
+
+    public Video() {
+
+    }
 
     public Video(boolean isSection, Date lastModified) {
         this.isSection = isSection;
@@ -40,6 +46,14 @@ public class Video implements Comparable<Video> {
         this.file = file;
     }
 
+    public Uri getFileUri() {
+        return fileUri;
+    }
+
+    public void setFileUri(Uri fileUri) {
+        this.fileUri = fileUri;
+    }
+
     public Bitmap getThumbnail() {
         return thumbnail;
     }
@@ -54,6 +68,10 @@ public class Video implements Comparable<Video> {
 
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public void setLastModified(long lastModified) {
+        this.lastModified = new Date(lastModified * 1000);
     }
 
     public boolean isSection() {
@@ -81,7 +99,8 @@ public class Video implements Comparable<Video> {
     public String toString() {
         return "Video{" +
                 "FileName='" + FileName + '\'' +
-                ", file=" + file +
+                ", file=" + fileUri +
+                ", filePath=" + fileUri.getPath() +
                 ", thumbnail=" + thumbnail +
                 ", lastModified=" + lastModified +
                 ", isSection=" + isSection +

@@ -8,7 +8,6 @@ import android.media.MediaFormat;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Handler;
-import android.os.StatFs;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
@@ -205,15 +204,7 @@ public class ConfigHelper {
         return VideoCodec;
     }
 
-    public long getFreeSpaceInBytes(String SAVEPATH) {
-        StatFs FSStats = new StatFs(SAVEPATH);
-        long bytesAvailable = FSStats.getAvailableBytes();// * FSStats.getBlockCountLong();
-        Log.d(Const.TAG, "Free space in GB: " + bytesAvailable / (1000 * 1000 * 1000));
-        return bytesAvailable;
-    }
-
-    //Return filename of the video to be saved formatted as chosen by the user
-    public String getFileSaveName(String SAVEPATH) {
+    public String getFileName() {
         Config config = Config.getInstance(mContext);
         String filename = config.getFileFormat();
 
@@ -222,8 +213,7 @@ public class ConfigHelper {
         String prefix = config.getPrefix();
         Date today = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat(filename);
-        //return new File(SAVEPATH,prefix + "_" + formatter.format(today)+".mp4").getPath();
-        return SAVEPATH + "/" + prefix + "_" + formatter.format(today);
+        return prefix + "_" + formatter.format(today);
     }
 
     private void disableWarningDialogButtons(AlertDialog dialog) {

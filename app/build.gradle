@@ -77,23 +77,21 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     implementation "androidx.camera:camera-camera2:1.0.0-beta05"
     implementation "androidx.camera:camera-view:1.0.0-alpha12"
+    /*implementation "com.github.topjohnwu.libsu:core:2.5.1"*/
     implementation "com.leinardi.android:speed-dial:3.1.1"
-
+    implementation "io.reactivex.rxjava3:rxjava:3.0.4"
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    implementation 'ly.count.android:sdk:18.08.1'
+    implementation 'com.orpheusdroid.crashreporter:crashreporter:1.0.4'
     implementation ("com.github.bumptech.glide:glide:4.11.0") {
         exclude group: "com.android.support"
     }
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
-
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.facebook.shimmer:shimmer:0.5.0'
-
-    implementation "com.github.topjohnwu.libsu:core:2.5.1"
-    implementation 'ly.count.android:sdk:18.08.1'
-
-    implementation 'com.orpheusdroid.crashreporter:crashreporter:1.0.4'
 
     playstoreImplementation 'org.solovyev.android:checkout:1.2.1'
     playstoreDonateImplementation 'org.solovyev.android:checkout:1.2.1'

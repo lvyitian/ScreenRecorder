@@ -1,7 +1,6 @@
 package com.orpheusdroid.screenrecorder.views;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
@@ -10,17 +9,14 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.orpheusdroid.screenrecorder.interfaces.OrientationChangeListener;
 import com.orpheusdroid.screenrecorder.utils.Log;
 
 public class FloatingView extends FrameLayout {
-    public boolean isLandScape = false;
     private FloatMoveCallback mCallBack;
     private float mDownX;
     private float mDownY;
     private int mInterceptX = 0;
     private int mInterceptY = 0;
-    private OrientationChangeListener mListener;
     private int mScreenWidth;
     private int mStatusBarHeight;
     private int mTouchSlop = 8;
@@ -39,10 +35,6 @@ public class FloatingView extends FrameLayout {
 
     public FloatingView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-    }
-
-    public void setListener(OrientationChangeListener listener) {
-        this.mListener = listener;
     }
 
     public void setCallback(FloatMoveCallback callback) {
@@ -114,24 +106,6 @@ public class FloatingView extends FrameLayout {
         if (this.mCallBack != null) {
             this.mCallBack.onActionDown(event);
         }
-    }
-
-    protected void onConfigurationChanged(Configuration newConfig) {
-        boolean isLandscape = false;
-        super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == 2) {
-            this.isLandScape = true;
-            this.mListener.update(true);
-        } else if (newConfig.orientation == 1) {
-            this.isLandScape = false;
-            this.mListener.update(false);
-        }
-        String str = "Float";
-        StringBuilder append = new StringBuilder().append("onConfigurationChanged isLand=");
-        if (newConfig.orientation != 2) {
-            isLandscape = false;
-        }
-        Log.d(str, append.append(isLandscape).toString());
     }
 
     public interface FloatMoveCallback {

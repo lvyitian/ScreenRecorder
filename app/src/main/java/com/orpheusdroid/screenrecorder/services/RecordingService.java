@@ -127,6 +127,14 @@ public class RecordingService extends Service {
                 .registerReceiver(serviceBroadcastReceiver, new IntentFilter(Const.SEVICE_STATUS_BROADCAST_REQUEST_ACTION));
     }
 
+    public Config getConfig() {
+        return config == null ? Config.getInstance(this) : config;
+    }
+
+    public ConfigHelper getConfigHelper() {
+        return configHelper == null ? ConfigHelper.getInstance(this) : configHelper;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(Const.TAG, "Starting Service. isBound: " + isBound + ", isRecording: " + isRecording);
@@ -161,7 +169,7 @@ public class RecordingService extends Service {
                 //break;
                 case Const.SCREEN_RECORDING_START:
                     //SAVEPATH = //configHelper.getFileSaveName(config.getSaveLocation());
-                    SAVEPATH = configHelper.getFileName();
+                    SAVEPATH = getConfigHelper().getFileName();
                     //currentFilePath = SAVEPATH;
                     /*notificationHelper.setSAVEPATH(SAVEPATH);
                     File savelocation = new File(SAVEPATH);
@@ -191,12 +199,12 @@ public class RecordingService extends Service {
 
     private void startRecording() {
         showNotification();
-        config.buildConfig();
+        getConfig().buildConfig();
         resolution = resolutionHelper.getWidthHeight();
 
         mMediaRecorder = new MediaRecorder();
 
-        if (config.isFloatingControls()) {
+        if (getConfig().isFloatingControls()) {
             if (!isBound) {
                 showFloatingControls();
             }
@@ -233,13 +241,13 @@ public class RecordingService extends Service {
         /*if (floatingControlService != null)
             floatingControlService.onRecordingStarted();*/
 
-        if (config.isTargetApp() && !config.getTargetAppPackage().equals("")) {
-            startActivity(getPackageManager().getLaunchIntentForPackage(config.getTargetAppPackage()));
+        if (getConfig().isTargetApp() && !getConfig().getTargetAppPackage().equals("")) {
+            startActivity(getPackageManager().getLaunchIntentForPackage(getConfig().getTargetAppPackage()));
         }
 
         try {
             mMediaRecorder.start();
-            if (config.isCameraOverlay()) {
+            if (getConfig().isCameraOverlay()) {
                 Intent floatingCameraIntent = new Intent(this, FloatingCameraViewService.class);
                 startService(floatingCameraIntent);
                 bindService(floatingCameraIntent,
@@ -335,13 +343,13 @@ public class RecordingService extends Service {
 
     private void initRecorder() {
         boolean mustRecAudio = false;
-        String audioBitRate = config.getAudioBitrate();
-        String audioSamplingRate = config.getAudioSamplingRate();
-        String audioChannel = config.getAudioChannel();
-        String audioRecSource = config.getAudioSource();
+        String audioBitRate = getConfig().getAudioBitrate();
+        String audioSamplingRate = getConfig().getAudioSamplingRate();
+        String audioChannel = getConfig().getAudioChannel();
+        String audioRecSource = getConfig().getAudioSource();
         //String SAVEPATH = config.getSaveLocation();
-        int FPS = Integer.parseInt(config.getFps());
-        int BITRATE = Integer.parseInt(config.getVideoBitrate());
+        int FPS = Integer.parseInt(getConfig().getFps());
+        int BITRATE = Integer.parseInt(getConfig().getVideoBitrate());
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -403,7 +411,7 @@ public class RecordingService extends Service {
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             mMediaRecorder.setOutputFile(currentFile);
             mMediaRecorder.setVideoSize(resolution.getWIDTH(), resolution.getHEIGHT());
-            mMediaRecorder.setVideoEncoder(configHelper.getBestVideoEncoder(resolution.getWIDTH(), resolution.getHEIGHT()));
+            mMediaRecorder.setVideoEncoder(getConfigHelper().getBestVideoEncoder(resolution.getWIDTH(), resolution.getHEIGHT()));
             //mMediaRecorder.setMaxFileSize(configHelper.getFreeSpaceInBytes(config.getSaveLocation()));
             if (mustRecAudio)
                 mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
@@ -491,7 +499,7 @@ public class RecordingService extends Service {
             android.util.Log.i(Const.TAG, "MediaProjection Stopped");
         } catch (RuntimeException e) {
             Log.d(Const.TAG, "Fatal exception! Destroying media projection failed." + "\n" + e);
-            if (new File(config.getSaveLocation()).delete())
+            if (new File(getConfig().getSaveLocation()).delete())
                 Log.d(Const.TAG, "Corrupted file delete successful");
             Toast.makeText(this, getString(R.string.fatal_exception_message), Toast.LENGTH_SHORT).show();
             CrashReporter.logException(e);
@@ -563,7 +571,7 @@ public class RecordingService extends Service {
 
     @Override
     public void onDestroy() {
-        if (config.isFloatingControls() && isBound) {
+        if (getConfig().isFloatingControls() && isBound) {
             //unbindService(floatingCameraConnection);
         }
         if (serviceBroadcastReceiver != null)

@@ -126,6 +126,7 @@
     <string name="screen_recording_stopped_toast">Screen Recording stopped</string>
     <string name="screen_recording_resumed_toast">Screen Recording resumed</string>
     <string name="screen_recording_paused_toast">Screen Recording paused</string>
+    <string name="no_media_app_toast">No app is installed to play this video</string>
 
     <!-- Video fragment strings -->
     <string name="video_list_no_video_message">No videos available</string>

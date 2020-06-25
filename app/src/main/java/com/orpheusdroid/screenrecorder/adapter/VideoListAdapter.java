@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -122,7 +123,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     Log.d(Const.TAG, "Video clicked");
                     Intent videoPlayer = new Intent(Intent.ACTION_VIEW);
                     videoPlayer.setDataAndType(videoItem.getVideo().getFileUri(), "video/mp4");
-                    context.startActivity(videoPlayer);
+                    if (videoPlayer.resolveActivity(context.getPackageManager()) != null) {
+                        context.startActivity(videoPlayer);
+                    } else {
+                        Toast.makeText(context, R.string.no_media_app_toast, Toast.LENGTH_SHORT).show();
+                    }
                 });
 
                 videoViewHolder.videoThumbLayout.setOnLongClickListener(view -> {

@@ -5,9 +5,9 @@ import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.CheckBoxPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.orpheusdroid.screenrecorder.Config;
 import com.orpheusdroid.screenrecorder.Const;
@@ -69,20 +69,20 @@ public class PreferenceListener implements IPreferenceChangeListener {
                 }
                 break;
             case "floating_controls":
-                if (((CheckBoxPreference) preference).isChecked()) {
+                if (((SwitchPreferenceCompat) preference).isChecked()) {
                     permissionHelper.requestSystemWindowsPermission(Const.FLOATING_CONTROLS_SYSTEM_WINDOWS_CODE);
                     config.setFloatingControls(true);
                 } else
                     config.setFloatingControls(false);
                 break;
             case "touch_pointer":
-                if (((CheckBoxPreference) preference).isChecked()) {
+                if (((SwitchPreferenceCompat) preference).isChecked()) {
                     if (!permissionHelper.hasPluginInstalled())
-                        ((CheckBoxPreference) preference).setChecked(false);
+                        ((SwitchPreferenceCompat) preference).setChecked(false);
                 }
                 break;
             case "camera_overlay":
-                if (((CheckBoxPreference) preference).isChecked()) {
+                if (((SwitchPreferenceCompat) preference).isChecked()) {
                     permissionHelper.requestPermissionCamera();
                     permissionHelper.requestSystemWindowsPermission(Const.CAMERA_SYSTEM_WINDOWS_CODE);
                 }

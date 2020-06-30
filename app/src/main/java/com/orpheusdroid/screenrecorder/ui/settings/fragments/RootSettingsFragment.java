@@ -7,10 +7,10 @@ import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
-import androidx.preference.CheckBoxPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.orpheusdroid.screenrecorder.Const;
 import com.orpheusdroid.screenrecorder.R;
@@ -33,11 +33,11 @@ public class RootSettingsFragment extends PreferenceFragmentCompat implements Sh
     // Get preferences only for which has to be validated for permission
     private ListPreference audioSource;
 
-    private CheckBoxPreference floatingControls;
+    private SwitchPreferenceCompat floatingControls;
 
     //private CheckBoxPreference showTouches;
 
-    private CheckBoxPreference cameraOverlay;
+    private SwitchPreferenceCompat cameraOverlay;
 
     private ListPreference languages;
 

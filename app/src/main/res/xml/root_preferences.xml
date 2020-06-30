@@ -97,7 +97,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/recording_settings_header">
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             app:defaultValue="false"
             app:key="@string/preference_floating_control_key"
             app:summary="@string/preference_floating_control_summary"
@@ -123,7 +123,7 @@
             app:key="@string/preference_camera_overlay_key"
             app:summary="@string/preference_camera_overlay_summary"
             app:title="@string/preference_camera_overlay_title" /> -->
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             app:defaultValue="false"
             app:key="@string/preference_enable_target_app_key"
             app:summary="@string/preference_enable_target_app_summary"

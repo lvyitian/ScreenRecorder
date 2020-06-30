@@ -21,7 +21,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
@@ -29,11 +28,11 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.orpheusdroid.crashreporter.CrashReporter;
 import com.orpheusdroid.screenrecorder.utils.LocaleHelper;
 
-import ly.count.android.sdk.Countly;
-import ly.count.android.sdk.DeviceId;
+import java.util.ArrayList;
 
-import static com.orpheusdroid.screenrecorder.Const.ANALYTICS_API_KEY;
-import static com.orpheusdroid.screenrecorder.Const.ANALYTICS_URL;
+import ly.count.android.sdk.Countly;
+import ly.count.android.sdk.CountlyConfig;
+import ly.count.android.sdk.DeviceId;
 
 /**
  * Todo: Add class description here
@@ -81,33 +80,35 @@ public class ScreenCamBaseApp extends Application {
     }
 
     public void setupAnalytics() {
-        Countly.sharedInstance()
-                .setRequiresConsent(true)
-                .setLoggingEnabled(true)
-                .setHttpPostForced(true)
-                .enableParameterTamperingProtection(getPackageName())
-                .setViewTracking(true)
-                .setIfStarRatingShownAutomatically(true)
-                .setAutomaticStarRatingSessionLimit(3)
-                .setIfStarRatingDialogIsCancellable(true)
-                .enableCrashReporting();
+        Config.getInstance(this).buildConfig();
+        if (Config.getInstance(this).shouldSetupAnalytics()) {
+            ArrayList<String> features = new ArrayList<String>();
+            CountlyConfig countlyConfig = new CountlyConfig(this, "07273a5c91f8a932685be1e3ad0d160d3de6d4ba", "https://analytics.orpheusdroid.com")
+                    .setIdMode(DeviceId.Type.OPEN_UDID)
+                    .setHttpPostForced(true)
+                    .setRecordAllThreadsWithCrash()
+                    .setLoggingEnabled(BuildConfig.DEBUG)
+                    .setViewTracking(true)
+                    .enableCrashReporting()
+                    .setParameterTamperingProtectionSalt(getPackageName())
+                    .setRequiresConsent(true);
 
-        String[] groupFeatures = new String[]{Countly.CountlyFeatureNames.sessions
-                , Countly.CountlyFeatureNames.users, Countly.CountlyFeatureNames.events
-                , Countly.CountlyFeatureNames.starRating};
-        Countly.sharedInstance().createFeatureGroup(Const.COUNTLY_USAGE_STATS_GROUP_NAME, groupFeatures);
+            if (Config.getInstance(this).isCrashReportsEnabled()) {
+                features.add(Countly.CountlyFeatureNames.crashes);
+            }
+            if (Config.getInstance(this).isUsageStatsEnabled()) {
+                features.add(Countly.CountlyFeatureNames.sessions);
+                features.add(Countly.CountlyFeatureNames.views);
+                features.add(Countly.CountlyFeatureNames.events);
+                features.add(Countly.CountlyFeatureNames.users);
+            }
 
-        boolean isUsageStatsEnabled = PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getBoolean(getString(R.string.preference_anonymous_statistics_key), false);
-        Countly.sharedInstance().setConsentFeatureGroup(Const.COUNTLY_USAGE_STATS_GROUP_NAME, isUsageStatsEnabled);
+            countlyConfig.setConsentEnabled(features.toArray(new String[0]));
+            Countly.sharedInstance().init(countlyConfig);
 
-        boolean isCrashesEnabled = PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getBoolean(getString(R.string.preference_crash_reporting_key), false);
-        Countly.sharedInstance().setConsent(new String[]{Countly.CountlyFeatureNames.crashes}, isCrashesEnabled);
-
-        Countly.sharedInstance().init(this, ANALYTICS_URL, ANALYTICS_API_KEY, null, DeviceId.Type.OPEN_UDID);
-        Log.d(Const.TAG, "Countly setup");
+            Log.d(Const.TAG, "Crashlytics enabled");
+        } else {
+            Log.d(Const.TAG, "Crashlytics disabled");
+        }
     }
 }

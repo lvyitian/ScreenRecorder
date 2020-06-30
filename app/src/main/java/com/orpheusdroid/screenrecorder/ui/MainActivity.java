@@ -31,6 +31,7 @@ import com.orpheusdroid.screenrecorder.Config;
 import com.orpheusdroid.screenrecorder.Const;
 import com.orpheusdroid.screenrecorder.DonateActivity;
 import com.orpheusdroid.screenrecorder.R;
+import com.orpheusdroid.screenrecorder.ScreenCamApp;
 import com.orpheusdroid.screenrecorder.interfaces.IPermissionListener;
 import com.orpheusdroid.screenrecorder.interfaces.VideoFragmentListener;
 import com.orpheusdroid.screenrecorder.services.RecordingService;
@@ -39,6 +40,8 @@ import com.orpheusdroid.screenrecorder.utils.Log;
 import com.orpheusdroid.screenrecorder.utils.PermissionHelper;
 
 import java.util.ArrayList;
+
+import ly.count.android.sdk.Countly;
 
 public class MainActivity extends BaseActivity {
     private PermissionHelper permissionHelper;
@@ -190,6 +193,17 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (Config.getInstance(this).shouldSetupAnalytics()) {
+            if (!Countly.sharedInstance().isInitialized()) {
+                ((ScreenCamApp) getApplication()).setupAnalytics();
+            }
+            Countly.sharedInstance().onStart(this);
+        }
+    }
+
+    @Override
     protected void onResume() {
         isServiceRunning = false;
         Log.d(Const.TAG, "PONG is set to false");
@@ -203,6 +217,14 @@ public class MainActivity extends BaseActivity {
     protected void onPause() {
         Log.d(Const.TAG, "PONG destroyed");
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        if (Countly.sharedInstance().isInitialized()) {
+            Countly.sharedInstance().onStop();
+        }
+        super.onStop();
     }
 
     @Override

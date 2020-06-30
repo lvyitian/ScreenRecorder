@@ -138,6 +138,28 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/crashlytics_settings_header">
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="@string/preference_crashlytics_master_key"
+            android:title="@string/preference_crashlytics_master_title" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="@string/preference_crashlytics_master_key"
+            android:key="@string/preference_crashlytics_crash_report_key"
+            android:summary="@string/preference_crashlytics_crash_report_summary"
+            android:title="@string/preference_crashlytics_crash_report_title" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:dependency="@string/preference_crashlytics_master_key"
+            android:key="@string/preference_crashlytics_usage_stats_key"
+            android:summary="@string/preference_crashlytics_usage_stats_summary"
+            android:title="@string/preference_crashlytics_usage_stats_title" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/misc_settings_header">
         <ListPreference
             android:defaultValue="-1"

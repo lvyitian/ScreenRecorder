@@ -83,7 +83,7 @@ dependencies {
     implementation "io.reactivex.rxjava3:rxjava:3.0.4"
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
-    implementation 'ly.count.android:sdk:18.08.1'
+    implementation 'ly.count.android:sdk:20.04.2'
     implementation 'com.orpheusdroid.crashreporter:crashreporter:1.0.4'
     implementation ("com.github.bumptech.glide:glide:4.11.0") {
         exclude group: "com.android.support"

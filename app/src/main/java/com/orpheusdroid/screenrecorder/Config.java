@@ -41,6 +41,10 @@ public class Config {
 
     private String language;
 
+    private boolean crashlyticsEnabled;
+    private boolean crashReportsEnabled;
+    private boolean usageStatsEnabled;
+
     private Config(Context mContext) {
         this.mContext = mContext;
     }
@@ -224,6 +228,34 @@ public class Config {
         isRootMode = rootMode;
     }
 
+    public boolean isCrashlyticsEnabled() {
+        return crashlyticsEnabled;
+    }
+
+    public void setCrashlyticsEnabled(boolean crashlyticsEnabled) {
+        this.crashlyticsEnabled = crashlyticsEnabled;
+    }
+
+    public boolean isCrashReportsEnabled() {
+        return crashReportsEnabled;
+    }
+
+    public void setCrashReportsEnabled(boolean crashReportsEnabled) {
+        this.crashReportsEnabled = crashReportsEnabled;
+    }
+
+    public boolean isUsageStatsEnabled() {
+        return usageStatsEnabled;
+    }
+
+    public void setUsageStatsEnabled(boolean usageStatsEnabled) {
+        this.usageStatsEnabled = usageStatsEnabled;
+    }
+
+    public boolean shouldSetupAnalytics() {
+        return isCrashlyticsEnabled() && (isCrashReportsEnabled() || isUsageStatsEnabled());
+    }
+
     private SharedPreferences getPreferences() {
         if (preferences == null) {
             preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -261,6 +293,11 @@ public class Config {
         codecOverride = preferences.getString(getString(R.string.preference_advanced_settings_video_encoder_key), "0");
 
         language = preferences.getString(getString(R.string.preference_language_key), Locale.getDefault().getISO3Language());
+
+        crashlyticsEnabled = preferences.getBoolean(getString(R.string.preference_crashlytics_master_key), false);
+        crashReportsEnabled = preferences.getBoolean(getString(R.string.preference_crashlytics_crash_report_key), false);
+        usageStatsEnabled = preferences.getBoolean(getString(R.string.preference_crashlytics_usage_stats_key), false);
+
         buildThemeConfig();
     }
 
@@ -271,7 +308,8 @@ public class Config {
     @Override
     public String toString() {
         return "Config{" +
-                "mContext=" + mContext +
+                "preferences=" + preferences +
+                ", mContext=" + mContext +
                 ", saveLocation='" + saveLocation + '\'' +
                 ", fileFormat='" + fileFormat + '\'' +
                 ", prefix='" + prefix + '\'' +
@@ -283,13 +321,19 @@ public class Config {
                 ", audioBitrate='" + audioBitrate + '\'' +
                 ", audioChannel='" + audioChannel + '\'' +
                 ", audioSamplingRate='" + audioSamplingRate + '\'' +
+                ", themePreference='" + themePreference + '\'' +
                 ", floatingControls=" + floatingControls +
                 ", showTouches=" + showTouches +
                 ", cameraOverlay=" + cameraOverlay +
                 ", targetApp=" + targetApp +
+                ", isMagiskMode=" + isMagiskMode +
+                ", isRootMode=" + isRootMode +
                 ", targetAppPackage='" + targetAppPackage + '\'' +
                 ", codecOverride='" + codecOverride + '\'' +
                 ", language='" + language + '\'' +
+                ", crashlyticsEnabled=" + crashlyticsEnabled +
+                ", crashReportsEnabled=" + crashReportsEnabled +
+                ", usageStatsEnabled=" + usageStatsEnabled +
                 '}';
     }
 }

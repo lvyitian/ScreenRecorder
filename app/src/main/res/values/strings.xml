@@ -112,13 +112,18 @@
     <!-- Video Settings -->
     <string name="preference_advanced_settings_video_encoder_title">Video Encoder</string>
     <string name="preference_advanced_settings_video_encoder_description">Override the default encoder.</string>
-    <string name="preference_advanced_settings_video_encoder_key">video_encoder</string>
+    <string name="preference_advanced_settings_video_encoder_key" translatable="false">video_encoder</string>
 
     <!-- Countly Strings -->
-
-    <string name="preference_crash_reporting_key" translatable="false">crash_reporting</string>
-
-    <string name="preference_anonymous_statistics_key" translatable="false">usage_statistics</string>
+    <string name="crashlytics_settings_header">Statistics and Crash reporting</string>
+    <string name="preference_crashlytics_master_title">Enable Crashlytics</string>
+    <string name="preference_crashlytics_master_key" translatable="false">crashlytics_key</string>
+    <string name="preference_crashlytics_crash_report_title">Send Crash reports</string>
+    <string name="preference_crashlytics_crash_report_summary">Automatically send crash reports when app crashes</string>
+    <string name="preference_crashlytics_crash_report_key" translatable="false">crash_report_key</string>
+    <string name="preference_crashlytics_usage_stats_title">Send usage statistics</string>
+    <string name="preference_crashlytics_usage_stats_summary">Send anonymous usage statics</string>
+    <string name="preference_crashlytics_usage_stats_key" translatable="false">statistics_key</string>
 
     <!-- Toast messages -->
     <string name="recording_failed_toast">Screen recording failed.</string>

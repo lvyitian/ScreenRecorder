@@ -62,10 +62,17 @@
         </activity>
 
         <activity
+            android:name=".ui.ShortcutActionActivity"
+            android:theme="@style/AppTheme.Transparent" />
+
+
+        <activity
             android:name=".ui.AboutActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity android:name=".ui.PrivacyPolicy" />
+
+        <activity android:name=".utils.SAFMigrationUtil" />
 
         <activity android:name=".ui.FAQActivity" />
 

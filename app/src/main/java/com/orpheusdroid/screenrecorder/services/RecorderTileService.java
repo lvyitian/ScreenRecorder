@@ -11,7 +11,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.orpheusdroid.screenrecorder.Const;
 import com.orpheusdroid.screenrecorder.R;
-import com.orpheusdroid.screenrecorder.ui.MainActivity;
+import com.orpheusdroid.screenrecorder.ui.ShortcutActionActivity;
 import com.orpheusdroid.screenrecorder.utils.Log;
 
 public class RecorderTileService extends TileService {
@@ -62,7 +62,7 @@ public class RecorderTileService extends TileService {
             startService(recorderService);
 
         } else {
-            Intent recordingIntent = new Intent(this, MainActivity.class)
+            Intent recordingIntent = new Intent(this, ShortcutActionActivity.class)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     .setAction(Const.SCREEN_RECORDER_START_RECORDING_INTENT);
             startActivityAndCollapse(recordingIntent);

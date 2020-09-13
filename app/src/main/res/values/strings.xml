@@ -132,6 +132,7 @@
     <string name="screen_recording_resumed_toast">Screen Recording resumed</string>
     <string name="screen_recording_paused_toast">Screen Recording paused</string>
     <string name="no_media_app_toast">No app is installed to play this video</string>
+    <string name="screen_recording_permission_denied">Screen Recording Permission Denied</string>
 
     <!-- Video fragment strings -->
     <string name="video_list_no_video_message">No videos available</string>
@@ -179,4 +180,9 @@
     <!-- Tile strings -->
     <string name="tile_start_recording">Start Recording</string>
     <string name="tile_stop_recording">Stop Recording</string>
+    <string name="saf_util_info_header_collecting_info">Collecting Information</string>
+    <string name="saf_util_info_header_copying">Moving videos</string>
+    <string name="saf_util_progress_text">PROGRESS: %1$d</string>
+    <string name="saf_util_move_count">%1$d/%2$d</string>
+    <string name="saf_util_copying_text">Copying: %1$s</string>
 </resources>

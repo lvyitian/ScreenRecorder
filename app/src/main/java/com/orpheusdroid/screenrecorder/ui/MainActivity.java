@@ -308,11 +308,11 @@ public class MainActivity extends BaseActivity {
 
         //The user has denied permission for screen mirroring. Let's notify the user
         if (resultCode == RESULT_CANCELED && requestCode == Const.SCREEN_RECORD_REQUEST_CODE) {
-            /*Toast.makeText(this,
+            Toast.makeText(this,
                     getString(R.string.screen_recording_permission_denied), Toast.LENGTH_SHORT).show();
             //Return to home screen if the app was started from app shortcut
-            if (intentAction != null && intentAction.equals(getString(R.string.app_shortcut_action)))
-                this.finish();*/
+            if (intentAction != null && intentAction.equals(Const.SCREEN_RECORDER_START_RECORDING_INTENT))
+                this.finish();
             return;
 
         }

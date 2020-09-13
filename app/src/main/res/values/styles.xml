@@ -42,4 +42,17 @@
     <style name="Toolbar.TitleText" parent="Widget.Design.CollapsingToolbar">
         <item name="android:textColor">#fefefe</item>
     </style>
+
+    <!-- Transparent activity for shortcut action -->
+    <style name="AppTheme.Transparent" parent="Theme.AppCompat">
+        <item name="android:background">#00000000</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
 </resources>

@@ -9,7 +9,7 @@
         android:shortcutShortLabel="@string/tile_start_recording">
         <intent
             android:action="com.orpheusdroid.screenrecorder.START_RECORDING"
-            android:targetClass="com.orpheusdroid.screenrecorder.ui.MainActivity"
+            android:targetClass="com.orpheusdroid.screenrecorder.ui.ShortcutActionActivity"
             android:targetPackage="com.orpheusdroid.screenrecorder" />
         <!-- If your shortcut is associated with multiple intents, include them
              here. The last intent in the list determines what the user sees when

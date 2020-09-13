@@ -56,7 +56,7 @@ public class MainActivity extends BaseActivity {
     private ArrayList<String> files = new ArrayList<>();
 
     private RootSettingsFragment settingsFragment = new RootSettingsFragment();
-    private VideoListFragment videoListFragment = new VideoListFragment();
+    private VideoListFragment videoListFragment;
     private Fragment currentFragment = settingsFragment;
     private FragmentManager fm;
 
@@ -69,11 +69,6 @@ public class MainActivity extends BaseActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    /*getSupportFragmentManager()
-                            .beginTransaction()
-                            .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                            .replace(R.id.fragment, new RootSettingsFragment())
-                            .commit();*/
                     if (currentFragment == settingsFragment)
                         return false;
                     getSupportFragmentManager()
@@ -86,13 +81,13 @@ public class MainActivity extends BaseActivity {
                     fab.show();
                     return true;
                 case R.id.videos:
-                    /*getSupportFragmentManager()
-                            .beginTransaction()
-                            .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                            .replace(R.id.fragment, VideoListFragment.getInstance(), VideoListFragment.getTag())
-                            .commit();*/
                     if (currentFragment == videoListFragment)
                         return false;
+
+                    if (videoListFragment == null) {
+                        videoListFragment = new VideoListFragment();
+                        fm.beginTransaction().add(R.id.fragment, videoListFragment, "2").hide(videoListFragment).commit();
+                    }
                     getSupportFragmentManager()
                             .beginTransaction()
                             .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
@@ -108,15 +103,6 @@ public class MainActivity extends BaseActivity {
         }
     };
 
-    /*private void handleVideoFragment() {
-        Log.d(Const.TAG, "Calling video fragment");
-        getSupportFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                .replace(R.id.fragment, new VideoListFragment())
-                .commit();
-        fab.hide();
-    }*/
     private BroadcastReceiver pong = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             Const.RECORDING_STATUS status = (Const.RECORDING_STATUS) intent.getSerializableExtra(Const.SEVICE_STATUS_BROADCAST_STATUS_KEY);
@@ -134,17 +120,12 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment, new RootSettingsFragment())
-                .commit();*/
 
         fm = getSupportFragmentManager();
 
-        fm.beginTransaction().add(R.id.fragment, videoListFragment, "2").hide(videoListFragment).commit();
+        //fm.beginTransaction().replace(R.id.fragment, settingsFragment).commit();
         fm.beginTransaction().add(R.id.fragment, settingsFragment, "1").commit();
 
         navView = findViewById(R.id.bottom_navigation);
@@ -159,14 +140,6 @@ public class MainActivity extends BaseActivity {
 
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
-            /*boolean shouldShowFloatingControl = Config.getInstance(MainActivity.this).isFloatingControls();
-            Intent recordingIntent = new Intent(MainActivity.this, RecordingService.class);
-            if (shouldShowFloatingControl){
-                recordingIntent.setAction(Const.SCREEN_RECORDING_SHOW_FLOATING_ACTIONS);
-            } else {
-                recordingIntent.setAction(Const.SCREEN_RECORDING_START);
-            }
-            startService(recordingIntent);*/
             if (mediaProjection == null && !isServiceRunning) {
                 //Request Screen recording permission
                 startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), Const.SCREEN_RECORD_REQUEST_CODE);
@@ -180,7 +153,6 @@ public class MainActivity extends BaseActivity {
         });
 
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) ((View) navView.getParent()).getLayoutParams();
         params.setBehavior(new HideBottomViewOnScrollBehavior());
 

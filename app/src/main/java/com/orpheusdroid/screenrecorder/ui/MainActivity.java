@@ -75,13 +75,14 @@ public class MainActivity extends BaseActivity {
                 case R.id.navigation_home:
                     if (currentFragment == settingsFragment)
                         return false;
+                    currentFragment = settingsFragment;
                     getSupportFragmentManager()
                             .beginTransaction()
                             .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-                            .hide(currentFragment)
-                            .show(settingsFragment)
+                            .replace(R.id.fragment, currentFragment)
+                            //.hide(currentFragment)
+                            //.show(settingsFragment)
                             .commit();
-                    currentFragment = settingsFragment;
                     fab.show();
                     return true;
                 case R.id.videos:
@@ -90,15 +91,16 @@ public class MainActivity extends BaseActivity {
 
                     if (videoListFragment == null) {
                         videoListFragment = new VideoListFragment();
-                        fm.beginTransaction().add(R.id.fragment, videoListFragment, "2").hide(videoListFragment).commit();
+                        //fm.beginTransaction().add(R.id.fragment, videoListFragment, "2").hide(videoListFragment).commit();
                     }
+                    currentFragment = videoListFragment;
                     getSupportFragmentManager()
                             .beginTransaction()
                             .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
-                            .hide(currentFragment)
-                            .show(videoListFragment)
+                            .replace(R.id.fragment, currentFragment)
+                            //.hide(currentFragment)
+                            //.show(videoListFragment)
                             .commit();
-                    currentFragment = videoListFragment;
                     fab.hide();
                     //permissionHelper.requestPermissionStorage(Const.VIDEO_FRAGMENT_EXTDIR_REQUEST_CODE);
                     return true;
@@ -129,8 +131,8 @@ public class MainActivity extends BaseActivity {
 
         fm = getSupportFragmentManager();
 
-        //fm.beginTransaction().replace(R.id.fragment, settingsFragment).commit();
-        fm.beginTransaction().add(R.id.fragment, settingsFragment, "1").commit();
+        fm.beginTransaction().replace(R.id.fragment, settingsFragment).commit();
+        //fm.beginTransaction().add(R.id.fragment, settingsFragment, "1").commit();
 
         navView = findViewById(R.id.bottom_navigation);
 

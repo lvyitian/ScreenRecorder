@@ -10,6 +10,7 @@
 *.json
 /app_pub_key
 !faq.json
+!app/src/main/res/raw/loading_animation.json
 
 # Built application files
 *.apk

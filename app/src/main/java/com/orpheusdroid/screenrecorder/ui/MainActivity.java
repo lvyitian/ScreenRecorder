@@ -10,6 +10,7 @@ import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.orpheusdroid.crashreporter.ui.CrashReporterActivity;
 import com.orpheusdroid.screenrecorder.Config;
@@ -38,7 +40,9 @@ import com.orpheusdroid.screenrecorder.services.RecordingService;
 import com.orpheusdroid.screenrecorder.ui.settings.fragments.RootSettingsFragment;
 import com.orpheusdroid.screenrecorder.utils.Log;
 import com.orpheusdroid.screenrecorder.utils.PermissionHelper;
+import com.orpheusdroid.screenrecorder.utils.SAFMigrationUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import ly.count.android.sdk.Countly;
@@ -252,6 +256,22 @@ public class MainActivity extends BaseActivity {
             Log.d(Const.TAG, "write storage Permission granted");
             permissionHelper.createDir();
             permissionHelper.hideSnackbar();
+            File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Const.APPDIR + File.separator);
+            if (dir.isDirectory() && dir.canRead() && dir.listFiles() != null && dir.listFiles().length > 0) {
+                Log.d(Const.TAG, "SAF: Should move files");
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("Migrate to new directory structure")
+                        .setMessage("The app is migrating to new SAF API as a result custom directory locations are no more supported." +
+                                "More details could be found in FAQ." +
+                                "By clicking OK, the app would migrate your existing videos into the new directory" +
+                                "\n\nWARNING: This action is irreversible and you are solely responsible for any mishap. Backup data before proceeding.")
+                        .setNeutralButton(android.R.string.ok, ((dialogInterface, i) -> {
+                            startActivity(new Intent(this, SAFMigrationUtil.class));
+                        }))
+                        .setCancelable(false)
+                        .create().show();
+            }
+            Log.d(Const.TAG, "SAF: PATH: " + dir.getAbsolutePath());
             fab.setEnabled(true);
             /*if (videoFragmentListener != null)
                 videoFragmentListener.onStorageResult(true);*/

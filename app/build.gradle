@@ -7,7 +7,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 29
         versionCode 999
-        versionName "3.X.X Beta 3"
+        versionName "3.X.X Beta 4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -68,9 +68,9 @@ if (project.hasProperty('RELEASE_STORE_FILE')) {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.google.android.material:material:1.3.0-alpha01'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.3.0-alpha02'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
@@ -85,6 +85,7 @@ dependencies {
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
     implementation 'ly.count.android:sdk:20.04.2'
     implementation 'com.orpheusdroid.crashreporter:crashreporter:1.0.4'
+    implementation 'com.airbnb.android:lottie:3.4.1'
     implementation ("com.github.bumptech.glide:glide:4.11.0") {
         exclude group: "com.android.support"
     }
@@ -94,6 +95,6 @@ dependencies {
     playstoreDonateImplementation 'org.solovyev.android:checkout:1.2.1'
 
     testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test:runner:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }

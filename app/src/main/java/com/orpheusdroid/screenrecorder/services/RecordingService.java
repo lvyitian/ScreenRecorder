@@ -28,6 +28,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -204,7 +205,7 @@ public class RecordingService extends Service {
 
         mMediaRecorder = new MediaRecorder();
 
-        if (getConfig().isFloatingControls()) {
+        if (getConfig().isFloatingControls() && Settings.canDrawOverlays(this)) {
             if (!isBound) {
                 showFloatingControls();
             }

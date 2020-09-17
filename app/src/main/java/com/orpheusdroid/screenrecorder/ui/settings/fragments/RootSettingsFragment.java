@@ -69,12 +69,13 @@ public class RootSettingsFragment extends PreferenceFragmentCompat implements Sh
 
         ConfigHelper.getInstance(getActivity())
                 .prepareResolutions(findPreference(getString(R.string.res_key)));
+
+        if (floatingControls.isChecked())
+            permissionHelper.requestSystemWindowsPermission(Const.FLOATING_CONTROLS_SYSTEM_WINDOWS_CODE);
     }
 
     private void checkPermissions() {
         checkAudioRecPermission();
-        if (floatingControls.isChecked())
-            permissionHelper.requestSystemWindowsPermission(Const.FLOATING_CONTROLS_SYSTEM_WINDOWS_CODE);
 
         /*if (cameraOverlay.isChecked()) {
             permissionHelper.requestPermissionCamera();
